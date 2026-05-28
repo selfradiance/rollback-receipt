@@ -59,7 +59,7 @@ The receipt proves that, at prepare time:
 
 ## What Restore Does
 
-Restore validates a `rollback-receipt.receipt.v1` receipt, verifies each snapshot file still exists and matches the recorded SHA-256 hash, then atomically restores the snapshot bytes to the listed target path. It creates missing parent directories inside `project_root` when needed.
+Restore validates a `rollback-receipt.receipt.v1` receipt, verifies each snapshot file still exists and matches the recorded SHA-256 hash, then restores the snapshot bytes to the listed target path with a temp-file-then-rename write pattern. It creates missing parent directories inside `project_root` when needed.
 
 Restore does not delete extra files. It only restores explicitly listed regular files from the local snapshot receipt.
 
@@ -98,4 +98,3 @@ Restore does not delete extra files. It only restores explicitly listed regular 
 - Work Session Ledger: possible future assembler of receipts
 
 `rollback-receipt` is only the local receipt-and-restore proof for explicit regular files.
-

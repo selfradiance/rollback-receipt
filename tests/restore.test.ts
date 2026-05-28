@@ -90,6 +90,50 @@ describe("restore behavior", () => {
     ).rejects.toThrow(/hash mismatch/);
   });
 
+  it("rejects tampered receipt path fields that are not contained and exact", async () => {
+    const root = await createPreparedProject();
+    const receiptPath = path.join(root, ".rollback-receipt", "receipt.json");
+    const receipt = JSON.parse(await fs.readFile(receiptPath, "utf8"));
+    const originalAbsolutePath = receipt.files[0].absolute_path;
+
+    receipt.files[0].absolute_path = "workspace/demo.txt";
+    await writeJson(receiptPath, receipt);
+    await expect(
+      restoreFromReceiptFile({
+        receiptPath: ".rollback-receipt/receipt.json",
+        cwd: root
+      })
+    ).rejects.toThrow(/absolute_path/);
+
+    receipt.files[0].absolute_path = originalAbsolutePath;
+    receipt.files[0].snapshot_path = path.join(await fs.realpath(root), "outside-snapshot.txt");
+    await fs.writeFile(receipt.files[0].snapshot_path, "original demo\n");
+    await writeJson(receiptPath, receipt);
+    await expect(
+      restoreFromReceiptFile({
+        receiptPath: ".rollback-receipt/receipt.json",
+        cwd: root
+      })
+    ).rejects.toThrow(/snapshot_path.*escapes/);
+  });
+
+  it("rejects restoring over a symlink target", async () => {
+    const root = await createPreparedProject();
+    const outsidePath = path.join(root, "outside.txt");
+    const targetPath = path.join(root, "workspace", "demo.txt");
+    await fs.writeFile(outsidePath, "outside stays unchanged\n");
+    await fs.rm(targetPath);
+    await fs.symlink(outsidePath, targetPath);
+
+    await expect(
+      restoreFromReceiptFile({
+        receiptPath: ".rollback-receipt/receipt.json",
+        cwd: root
+      })
+    ).rejects.toThrow(/restore target is a symlink/);
+    await expect(fs.readFile(outsidePath, "utf8")).resolves.toBe("outside stays unchanged\n");
+  });
+
   it("uses temp-then-rename restore and does not touch unlisted files", async () => {
     const root = await createPreparedProject();
     await fs.writeFile(path.join(root, "workspace", "demo.txt"), "mutated\n");
@@ -106,4 +150,3 @@ describe("restore behavior", () => {
     await expect(fs.readFile(path.join(root, "workspace", "unlisted.txt"), "utf8")).resolves.toBe("changed but unlisted\n");
   });
 });
-

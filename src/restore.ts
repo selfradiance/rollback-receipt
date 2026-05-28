@@ -64,7 +64,12 @@ export async function restoreReceipt(receipt: RollbackReceipt): Promise<RestoreR
     }
 
     const targetAbs = resolveSafeRelativePath(projectRootReal, file.path);
-    if (path.resolve(file.absolute_path) !== targetAbs) {
+    const receiptAbsolutePath = requireAbsolutePath(file.absolute_path, `receipt absolute_path ${file.path}`);
+    if (file.absolute_path !== receiptAbsolutePath) {
+      throw new RollbackReceiptError(`receipt absolute_path is not normalized: ${file.absolute_path}`);
+    }
+
+    if (receiptAbsolutePath !== targetAbs) {
       throw new RollbackReceiptError(`receipt absolute_path does not match path: ${file.path}`);
     }
 
@@ -134,4 +139,3 @@ async function readJsonFile(filePath: string, label: string): Promise<unknown> {
     throw new RollbackReceiptError(`invalid JSON in ${label}: ${filePath}`);
   }
 }
-
