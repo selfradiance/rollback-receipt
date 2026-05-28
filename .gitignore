@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.rollback-receipt/
+coverage/
+ROLLBACK_RECEIPT_PROJECT_CONTEXT.md
+

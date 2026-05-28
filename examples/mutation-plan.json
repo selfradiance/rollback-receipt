@@ -1,0 +1,17 @@
+{
+  "schema_version": "rollback-receipt.plan.v1",
+  "project_root": ".",
+  "operation_id": "demo-session-001",
+  "reason": "Demo coding-agent mutation",
+  "files": [
+    {
+      "path": "examples/workspace/demo.txt",
+      "expected_operation": "modify"
+    },
+    {
+      "path": "examples/workspace/notes.txt",
+      "expected_operation": "delete"
+    }
+  ]
+}
+

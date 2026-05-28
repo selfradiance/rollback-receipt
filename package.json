@@ -1,0 +1,29 @@
+{
+  "name": "rollback-receipt",
+  "version": "0.1.0",
+  "description": "Narrow local CLI proof for explicit file rollback receipts.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prepare": "tsx src/cli.ts prepare",
+    "restore": "tsx src/cli.ts restore",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "demo:prepare": "tsx src/cli.ts prepare --plan examples/mutation-plan.json --snapshot-dir .rollback-receipt/snapshots --receipt-out .rollback-receipt/prepare-receipt.json",
+    "demo:restore": "tsx src/cli.ts restore --receipt .rollback-receipt/prepare-receipt.json",
+    "demo:roundtrip": "tsx scripts/demo-roundtrip.ts"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.11",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.7"
+  }
+}
